@@ -11,8 +11,9 @@ class Anketa(forms.Form):
         required=True
     )
     FIND_GENDERS = [("female", "Женского"), ("male", "Мужского"), ("both", "Без разницы")]
-    find_gender = forms.CharField(
+    find_gender = forms.ChoiceField(
         choices=FIND_GENDERS,
-        default="both"
+        widget=forms.Select,
+        required=True
     )
 

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Понравившиеся {% endblock %}
+
+{% block content %}
+
+{% for like in liked %}
+<div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="card col-6 offset-3">
+                <div class="d-flex mx-auto justify-content-center w-50" style="max-width: 30vh;">
+                    {% if like.profile.user_icon %}
+                    <img src="{{like.profile.user_icon.url}}" class="card-img-top" alt="..."
+                         style="border-radius: 100px;">
+                    {% else %}
+                    <img src="{% static 'default_user_icon.jpg' %}" style="border-radius: 100px;">
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-title">{{like.profile.user.username}}</h5>
+                    <p class="card-text">{{like.profile.annotation}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{like.profile.age}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div class="container my-2" style="width: 20vh;">
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'rl:liked' %}?page={{prev_page}}" class="btn btn-primary"><i class="fa-solid fa-circle-arrow-left"></i></a>
+        {% for page_num in pages %}
+        <a class="text-decoration-none" href="{% url 'rl:liked' %}?page={{page_num}}">{{page_num}}</a>
+        {% endfor %}
+        <a href="{% url 'rl:liked' %}?page={{next_page}}" class="btn btn-primary"><i class="fa-solid fa-circle-arrow-right"></i></a>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} {{user.username}}'s profile {% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="card col-6 offset-3">
+            <div class="d-flex mx-auto justify-content-center w-50" style="max-width: 30vh;">
+                {% if user_icon %}
+                <img src="{{user_icon.url}}" class="card-img-top rounded-circle my-2" style="width: 150px; height: 150px; object-fit: cover;" alt="...">
+                {% else %}
+                <img src="{% static 'default_user_icon.jpg' %}" class="rounded-circle">
+                {% endif %}
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title">{{username}}</h5>
+                <p class="card-text">{{annotation}}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Возраст: {{age}}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'rl:liked' %}" class="card-link"><i class="fa-solid fa-heart text-danger"> {{likes_count}}</i></a>
+                <a href="{% url 'rl:disliked' %}" class="card-link"><i class="fa-solid fa-heart-crack text-black"> {{dislikes_count}}</i></a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock %}

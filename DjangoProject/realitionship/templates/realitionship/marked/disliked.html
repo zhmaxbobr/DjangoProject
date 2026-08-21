@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Не понравившиеся {% endblock %}
+
+{% block content %}
+
+{% for dislike in disliked %}
+<div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="card col-6 offset-3">
+                <div class="d-flex mx-auto justify-content-center w-50" style="max-width: 30vh;">
+                    {% if dislike.profile.user_icon %}
+                    <img src="{{dislike.profile.user_icon.url}}" class="card-img-top" alt="..."
+                         style="border-radius: 100px;">
+                    {% else %}
+                    <img src="{% static 'default_user_icon.jpg' %}" style="border-radius: 100px;">
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-title">{{dislike.profile.user.username}}</h5>
+                    <p class="card-text">{{dislike.profile.annotation}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{dislike.profile.age}}</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

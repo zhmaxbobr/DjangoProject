@@ -10,15 +10,19 @@ class Profile(models.Model):
         on_delete=models.CASCADE,
         related_name = "profile"
     )
-
     user_icon = models.ImageField(
         upload_to="icons/",
         blank=True,
-        null=True
+        null=True,
+        default="default_user_icon.jpg"
     )
     annotation = models.CharField(
         max_length=280,
-        null=False
+        null=True
+    )
+    age = models.IntegerField(
+        blank=False,
+        null=True
     )
     liked = models.ManyToManyField(User, related_name="liked", blank=True)
     disliked = models.ManyToManyField(User, related_name="disliked", blank=True)

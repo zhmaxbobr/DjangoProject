@@ -1,6 +1,73 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from urllib3 import request
 
-
+from .forms import Anketa as form_anketa
+from .models import Anketa
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+
+
 def index(request):
     return render(request,"realitionship/index.html")
+
+@login_required
+def anketa(request):
+    if request.method == "POST":
+        form = form_anketa(request.POST)
+        if form.is_valid():
+            form_data = form.cleaned_data
+            Anketa.objects.create(
+                gender=form_data.get("gender"),
+                age = form_data.get("age"),
+                find_gender = form_data.get("find_gender"),
+                profile=request.user.profile
+            )
+        return redirect("app:profile")
+    else:
+        form = form_anketa()
+        return render(request,"realitionship/index.html", context={"form":form})
+
+@login_required
+def view_profile(request):
+    if request.method == "GET":
+        likes_count = request.user.profile.liked.count()
+        dislikes_count = request.user.profile.disliked.count()
+        annotation = request.user.profile.annotation
+        # = request.user.profile.anketa
+        #if anketa:
+        #age = request.user.profile.anketa.age or -1
+        user_icon = request.user.profile.user_icon
+        username = request.user.username
+        return render(
+            request,"realitionship/profile.html", context=
+        {
+            "likes_count":likes_count,
+            "dislikes_count":dislikes_count,
+            "annotation":annotation,
+           # "age":age,
+            "user_icon":user_icon,
+            "username":username
+        }
+                      )
+
+def view_liked(request):
+    liked_count = request.user.profile.liked.count()
+    limit = int(request.GET.get("limit",2))
+    current_page = int(request.GET.get("page",0))
+    offset = limit*current_page
+    end = limit+offset
+    pages = [page for page in range(round(liked_count/limit))]
+    print(pages)
+    next_page = current_page+1
+    prev_page = current_page-1
+    liked = request.user.profile.liked.all()[offset:end]
+
+    return render(request,"realitionship/marked/liked.html",context={"liked":liked,
+                                                                     "current_page":current_page,
+                                                                     "pages":pages,
+                                                                     "next_page":next_page,
+                                                                     "prev_page":prev_page})
+
+def view_disliked(request):
+    disliked = request.user.profile.disliked.all()
+    return render(request,"realitionship/marked/disliked.html",context={"disliked":disliked})
