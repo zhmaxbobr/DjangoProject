@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from gspread import oauth
 from urllib3 import request
 
 from .forms import Anketa as form_anketa
@@ -8,7 +9,8 @@ from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    return render(request,"realitionship/index.html")
+    profile = request.user.profile
+    return render(request,"realitionship/index.html", context={"profile":profile})
 
 @login_required
 def anketa(request):
@@ -57,16 +59,21 @@ def view_liked(request):
     offset = limit*current_page
     end = limit+offset
     pages = [page for page in range(round(liked_count/limit))]
-    print(pages)
     next_page = current_page+1
     prev_page = current_page-1
     liked = request.user.profile.liked.all()[offset:end]
+    show_next_btn = True if next_page <= pages[-1] else False
+    show_prev_btn = True if prev_page >= 0 else False
 
-    return render(request,"realitionship/marked/liked.html",context={"liked":liked,
+    return render(request,"realitionship/marked/liked.html",context={
+                                                                     "liked":liked,
                                                                      "current_page":current_page,
                                                                      "pages":pages,
                                                                      "next_page":next_page,
-                                                                     "prev_page":prev_page})
+                                                                     "prev_page":prev_page,
+                                                                     "show_next_btn":show_next_btn,
+                                                                     "show_prev_btn":show_prev_btn
+                                                                     })
 
 def view_disliked(request):
     disliked = request.user.profile.disliked.all()

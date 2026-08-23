@@ -40,11 +40,21 @@
 
 <div class="container my-2" style="width: 20vh;">
     <div class="d-flex justify-content-between">
-        <a href="{% url 'rl:liked' %}?page={{prev_page}}" class="btn btn-primary"><i class="fa-solid fa-circle-arrow-left"></i></a>
+        {% if show_prev_btn %}
+        <a href="{% url 'rl:liked' %}?page={{prev_page}}" class="btn btn-primary">
+            <i class="fa-solid fa-circle-arrow-left"></i>
+        </a>
+        {% endif %}
         {% for page_num in pages %}
         <a class="text-decoration-none" href="{% url 'rl:liked' %}?page={{page_num}}">{{page_num}}</a>
         {% endfor %}
-        <a href="{% url 'rl:liked' %}?page={{next_page}}" class="btn btn-primary"><i class="fa-solid fa-circle-arrow-right"></i></a>
+        {% if show_next_btn %}
+        <a href="{% url 'rl:liked' %}?page={{next_page}}" class="btn btn-primary">
+            <i class="fa-solid fa-circle-arrow-right"></i>
+        </a>
+        {% endif %}
+
+
     </div>
 </div>
 
