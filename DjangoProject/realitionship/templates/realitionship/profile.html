@@ -34,6 +34,10 @@
                 <a href="{% url 'rl:liked' %}" class="card-link"><i class="fa-solid fa-heart text-danger"> {{likes_count}}</i></a>
                 <a href="{% url 'rl:disliked' %}" class="card-link"><i class="fa-solid fa-heart-crack text-black"> {{dislikes_count}}</i></a>
             </div>
+            <div class="mb-2 d-flex justify-content-center">
+                  {% include 'realitionship/components/_logout_widget.html' %}
+            </div>
+
         </div>
     </div>
 

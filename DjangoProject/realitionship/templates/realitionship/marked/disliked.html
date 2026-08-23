@@ -12,15 +12,15 @@
                 <div class="d-flex mx-auto justify-content-center w-50" style="max-width: 30vh;">
                     {% if dislike.profile.user_icon %}
                     <img
-                      src="{{dislike.profile.user_icon.url}}"
-                      class="mt-3 border shadow rounded-circle"
-                      style="width: 150px; height: 150px; object-fit: cover;"
+                            src="{{dislike.profile.user_icon.url}}"
+                            class="mt-3 border shadow rounded-circle"
+                            style="width: 150px; height: 150px; object-fit: cover;"
                     >
                     {% else %}
                     <img
-                      src="{% static 'default_user_icon.jpg' %}"
-                      class="mt-3 border shadow rounded-circle"
-                      style="width: 150px; height: 150px; object-fit: cover;"
+                            src="{% static 'default_user_icon.jpg' %}"
+                            class="mt-3 border shadow rounded-circle"
+                            style="width: 150px; height: 150px; object-fit: cover;"
                     >
                     {% endif %}
                 </div>
@@ -37,6 +37,26 @@
 
     </div>
 </div>
+
 {% endfor %}
 
+<div class="container my-2" style="width: 20vh;">
+    <div class="d-flex justify-content-between">
+        {% if show_prev_btn %}
+        <a href="{% url 'rl:disliked' %}?page={{prev_page}}" class="btn btn-primary">
+            <i class="fa-solid fa-circle-arrow-left"></i>
+        </a>
+        {% endif %}
+        {% for page_num in pages %}
+        <a class="text-decoration-none" href="{% url 'rl:disliked' %}?page={{page_num}}">{{page_num}}</a>
+        {% endfor %}
+        {% if show_next_btn %}
+        <a href="{% url 'rl:disliked' %}?page={{next_page}}" class="btn btn-primary">
+            <i class="fa-solid fa-circle-arrow-right"></i>
+        </a>
+        {% endif %}
+
+
+    </div>
+</div>
 {% endblock %}

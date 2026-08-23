@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from gspread import oauth
-from urllib3 import request
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 from .forms import Anketa as form_anketa
 from .models import Anketa
@@ -9,8 +9,20 @@ from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    profile = request.user.profile
-    return render(request,"realitionship/index.html", context={"profile":profile})
+    #profile = request.user.profile
+    return render(request,"realitionship/index.html")
+
+def sign_up(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("rl:index")
+    else:
+        form = UserCreationForm()
+    return render(request, "registration/sign_up.html", context={"form": form})
+
 
 @login_required
 def anketa(request):
@@ -62,8 +74,12 @@ def view_liked(request):
     next_page = current_page+1
     prev_page = current_page-1
     liked = request.user.profile.liked.all()[offset:end]
-    show_next_btn = True if next_page <= pages[-1] else False
-    show_prev_btn = True if prev_page >= 0 else False
+    if len(pages) > 0:
+        show_next_btn = True if next_page <= pages[-1] else False
+        show_prev_btn = True if prev_page >= 0 else False
+    else:
+        show_next_btn = False
+        show_prev_btn = False
 
     return render(request,"realitionship/marked/liked.html",context={
                                                                      "liked":liked,
@@ -76,5 +92,28 @@ def view_liked(request):
                                                                      })
 
 def view_disliked(request):
-    disliked = request.user.profile.disliked.all()
-    return render(request,"realitionship/marked/disliked.html",context={"disliked":disliked})
+    disliked_count = request.user.profile.disliked.count()
+    limit = int(request.GET.get("limit", 2))
+    current_page = int(request.GET.get("page", 0))
+    offset = limit * current_page
+    end = limit + offset
+    pages = [page for page in range(round(disliked_count / limit))]
+    next_page = current_page + 1
+    prev_page = current_page - 1
+    disliked = request.user.profile.disliked.all()[offset:end]
+    if len(pages) > 0:
+        show_next_btn = True if next_page <= pages[-1] else False
+        show_prev_btn = True if prev_page >= 0 else False
+    else:
+        show_next_btn = False
+        show_prev_btn = False
+
+    return render(request, "realitionship/marked/disliked.html", context={
+        "disliked": disliked,
+        "current_page": current_page,
+        "pages": pages,
+        "next_page": next_page,
+        "prev_page": prev_page,
+        "show_next_btn": show_next_btn,
+        "show_prev_btn": show_prev_btn
+    })

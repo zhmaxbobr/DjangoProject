@@ -1,0 +1,6 @@
+<form action="{% url 'logout' %}" method="post">
+  {% csrf_token %}
+  {{form.as_p}}
+  <button type="submit" class="btn btn-danger">Выйти</button>
+  <input type="hidden" name="next" value="{% url 'rl:index' %}">
+</form>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %} Войти {% endblock %}
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    {{form}}
+    <input type="submit" value="Войти">
+    <input type="hidden" name="next" value="{% url 'rl:profile' %}">
+</form>
+
+<!--<a class="btn btn-warning" href="{% url 'password_reset' %}">Forgot the password?</a>-->
+
+{% endblock %}
