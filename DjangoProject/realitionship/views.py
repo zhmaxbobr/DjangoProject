@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from django.contrib import messages
 
 from .forms import Anketa as form_anketa
 from .models import Anketa
@@ -9,7 +10,10 @@ from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    #profile = request.user.profile
+    try:
+        _=request.user.profile.anketa
+    except Exception as e:
+        messages.warning(request, "Заполните анкету!")
     return render(request,"realitionship/index.html")
 
 def sign_up(request):
@@ -30,20 +34,31 @@ def anketa(request):
         form = form_anketa(request.POST)
         if form.is_valid():
             form_data = form.cleaned_data
-            Anketa.objects.create(
-                gender=form_data.get("gender"),
-                age = form_data.get("age"),
-                find_gender = form_data.get("find_gender"),
-                profile=request.user.profile
-            )
-        return redirect("app:profile")
+            try:
+                anketa = request.user.profile.anketa
+                anketa.gender=form_data.get("gender")
+                anketa.age = form_data.get("age")
+                anketa.find_gender = form_data.get("find_gender")
+                anketa.save()
+            except Exception as e:
+                Anketa.objects.create(
+                    gender=form_data.get("gender"),
+                    age = form_data.get("age"),
+                    find_gender = form_data.get("find_gender"),
+                    profile=request.user.profile
+                )
+        return redirect("rl:profile")
     else:
         form = form_anketa()
-        return render(request,"realitionship/index.html", context={"form":form})
+        return render(request,"realitionship/anketa.html", context={"form":form})
 
 @login_required
 def view_profile(request):
     if request.method == "GET":
+        try:
+            _ = request.user.profile.anketa
+        except Exception as e:
+            messages.warning(request, "Заполните анкету!")
         likes_count = request.user.profile.liked.count()
         dislikes_count = request.user.profile.disliked.count()
         annotation = request.user.profile.annotation

@@ -43,4 +43,4 @@ class Anketa(models.Model):
     age = models.IntegerField()
     FIND_GENDERS = [("female","Женского"), ("male","Мужского"), ("both","Без разницы")]
     find_gender =  models.CharField(choices=FIND_GENDERS, max_length=25)
-    profile = models.OneToOneField(Profile,on_delete=models.CASCADE,related_name="profile", null=True)
+    profile = models.OneToOneField(Profile,on_delete=models.CASCADE,related_name="anketa", null=True)
