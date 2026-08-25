@@ -4,10 +4,73 @@
 
 {% block content %}
 
-<form method="post">
-  {% csrf_token %}
-  {{form}}
-  <button class="btn btn-primary" type="submit">Submit</button>
-</form>
+<div class="row">
+  <div class="col-9 col-md-5 mx-auto">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        {{ form.non_field_errors }}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label">
+          {{ form.username.label }}
+        </label>
+        <input
+          type="text"
+          name="{{ form.username.name }}"
+          id="{{ form.username.id_for_label }}"
+          class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+          value="{{ form.username.value|default_if_none:'' }}"
+          autocomplete="username"
+          required
+        >
+        {% for error in form.username.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.password1.id_for_label }}" class="form-label">
+          {{ form.password1.label }}
+        </label>
+        <input
+          type="password"
+          name="{{ form.password1.name }}"
+          id="{{ form.password1.id_for_label }}"
+          class="form-control{% if form.password1.errors %} is-invalid{% endif %}"
+          autocomplete="new-password"
+          required
+        >
+        {% for error in form.password1.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.password2.id_for_label }}" class="form-label">
+          {{ form.password2.label }}
+        </label>
+        <input
+          type="password"
+          name="{{ form.password2.name }}"
+          id="{{ form.password2.id_for_label }}"
+          class="form-control{% if form.password2.errors %} is-invalid{% endif %}"
+          autocomplete="new-password"
+          required
+        >
+        {% for error in form.password2.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <input type="submit" class="btn btn-primary rounded-pill" value="Регистрация">
+        <input type="hidden" name="next" value="{% url 'rl:profile' %}">
+      </div>
+    </form>
+  </div>
+</div>
 
 {% endblock %}
