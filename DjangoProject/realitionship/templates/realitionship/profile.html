@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %} {{user.username}}'s profile {% endblock %}
+{% block title %} Профиль {{user.username}} {% endblock %}
 
 {% block content %}
 
@@ -25,7 +25,7 @@
 
             <div class="card-body">
                 <h5 class="card-title">{{username}}</h5>
-                <p class="card-text">{{annotation|truncatechars:150}}</p>
+                <p class="card-text">{{annotation|default:"Не указано"|truncatechars:150}}</p>
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Возраст: {{age|default:"Не указано"}}</li>
