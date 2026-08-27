@@ -23,29 +23,37 @@
         </button>
 
         <div class="collapse navbar-collapse navbar-text" id="navbarSupportedContent">
-            <ul class="navbar-nav d-flex justify-content-end">
+            <ul class="navbar-nav d-flex justify-content-end gap-2">
                 {% if not user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/accounts/login" style="color: #1A1F2A">Войти</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'rl:sign_up' %}" style="color: #1A1F2A">Зарегистрироваться</a>
-                </li>
+                  <li class="nav-item bg-secondary shadow-sm rounded-pill text-center">
+                      <a class="nav-link" href="{% url 'login' %}" style="color: white">Войти</a>
+                  </li>
+                  <li class="nav-item bg-secondary shadow-sm rounded-pill text-center">
+                      <a class="nav-link" href="{% url 'rl:sign_up' %}" style="color: white">Зарегистрироваться</a>
+                  </li>
+                {% else %}
+                  <li class="nav-item bg-secondary shadow-sm rounded-pill text-center">
+                    <a class="nav-link" href="{% url 'rl:profile' %}" style="color: white;">Профиль</a>
+                  </li>
+                  <li class="nav-item bg-secondary shadow-sm rounded-pill text-center">
+                    <a class="nav-link" href="{% url 'rl:anketa' %}" style="color: white;">Анкета</a>
+                  </li>
                 {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 {% if messages %}
-    <div class="row">
-        {% for msg in messages %}
-            <div role="alert" class="alert alert-{{msg.tags}} alert-dismissible fade show m-3 mx-auto col-9 col-md-5">
-            {{msg}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-             </div>
-         {% endfor %}
-</div>
-
+    <div class="container">
+      <div class="row">
+          {% for msg in messages %}
+              <div role="alert" class="alert alert-{{msg.tags}} alert-dismissible fade show m-3 mx-auto col-9 col-md-5">
+                {{msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+          {% endfor %}
+      </div>
+    </div>
 {% endif %}
 {% block content %}{% endblock %}
 

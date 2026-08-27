@@ -27,6 +27,9 @@ class Profile(models.Model):
     liked = models.ManyToManyField(User, related_name="liked", blank=True)
     disliked = models.ManyToManyField(User, related_name="disliked", blank=True)
 
+    def __str__(self):
+        return f"Profile: {self.user.username}"
+
 class Message(models.Model):
     text = models.CharField(
         max_length=4096,
@@ -44,3 +47,6 @@ class Anketa(models.Model):
     FIND_GENDERS = [("female","Женского"), ("male","Мужского"), ("both","Без разницы")]
     find_gender =  models.CharField(choices=FIND_GENDERS, max_length=25)
     profile = models.OneToOneField(Profile,on_delete=models.CASCADE,related_name="anketa", null=True)
+
+    def __str__(self):
+        return f"Anketa: {self.profile.user.username}"

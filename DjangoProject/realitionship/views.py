@@ -10,10 +10,12 @@ from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    try:
-        _=request.user.profile.anketa
-    except Exception as e:
-        messages.warning(request, "Заполните анкету!")
+    if request.user.is_authenticated:
+        try:
+            _=request.user.profile.anketa
+        # BUG: can not load relationship
+        except Exception:
+            messages.warning(request, "Заполните анкету!")
     return render(request,"realitionship/index.html")
 
 def sign_up(request):
@@ -64,7 +66,7 @@ def view_profile(request):
         annotation = request.user.profile.annotation
         # = request.user.profile.anketa
         #if anketa:
-        #age = request.user.profile.anketa.age or -1
+        age = request.user.profile.age
         user_icon = request.user.profile.user_icon
         username = request.user.username
         return render(
@@ -73,7 +75,7 @@ def view_profile(request):
             "likes_count":likes_count,
             "dislikes_count":dislikes_count,
             "annotation":annotation,
-           # "age":age,
+            "age":age,
             "user_icon":user_icon,
             "username":username
         }
