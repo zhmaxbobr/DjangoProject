@@ -32,6 +32,11 @@ def sign_up(request):
 
 @login_required
 def anketa(request):
+    try:
+        anketa = request.user.profile.anketa
+    except Exception:
+        anketa = None
+
     if request.method == "POST":
         form = form_anketa(request.POST)
         if form.is_valid():
@@ -51,7 +56,14 @@ def anketa(request):
                 )
         return redirect("rl:profile")
     else:
-        form = form_anketa()
+        initial = {}
+        if anketa:
+            initial = {
+                "gender": anketa.gender,
+                "age": anketa.age,
+                "find_gender": anketa.find_gender,
+            }
+        form = form_anketa(initial=initial)
         return render(request,"realitionship/anketa.html", context={"form":form})
 
 @login_required
