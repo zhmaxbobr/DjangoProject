@@ -1,12 +1,16 @@
+from venv import create
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
 
 from .forms import Anketa as form_anketa
-from .models import Anketa
+from .models import Anketa,Profile
 from django.contrib.auth.decorators import login_required
 # Create your views here.
+
+
 
 
 def index(request):
@@ -17,6 +21,26 @@ def index(request):
         except Exception:
             messages.warning(request, "Заполните анкету!")
     return render(request,"realitionship/index.html")
+
+
+@login_required
+def recomendation_search(request):
+    try:
+        anketa = request.user.profile.anketa
+    except Exception:
+        messages.warning(request, "Заполните анкету!")
+        return redirect("rl:anketa")
+
+    current_anketa = request.user.profile.anketa
+    anketes = Anketa.objects.filter(
+        age__gte=current_anketa.age - 2,
+        age__lte=current_anketa.age + 2,
+    )
+    if current_anketa.find_gender != "both":
+        anketes = anketes.filter(gender=current_anketa.find_gender)
+
+    return render(request, "realitionship/index.html",context={"anketes":anketes})
+
 
 def sign_up(request):
     if request.method == "POST":
@@ -32,6 +56,7 @@ def sign_up(request):
 
 @login_required
 def anketa(request):
+    default_age = 10
     try:
         anketa = request.user.profile.anketa
     except Exception:
@@ -45,6 +70,10 @@ def anketa(request):
                 anketa = request.user.profile.anketa
                 anketa.gender=form_data.get("gender")
                 anketa.age = form_data.get("age")
+                print(anketa.age,type(anketa.age))
+                if anketa.age <= 0:
+                    messages.error(request,"Возраст не может быть отрицательным!")
+                    return redirect("rl:anketa")
                 anketa.find_gender = form_data.get("find_gender")
                 anketa.save()
             except Exception as e:
@@ -70,15 +99,17 @@ def anketa(request):
 def view_profile(request):
     if request.method == "GET":
         try:
-            _ = request.user.profile.anketa
+            anketa = request.user.profile.anketa
         except Exception as e:
             messages.warning(request, "Заполните анкету!")
+            anketa = None
         likes_count = request.user.profile.liked.count()
         dislikes_count = request.user.profile.disliked.count()
         annotation = request.user.profile.annotation
-        # = request.user.profile.anketa
-        #if anketa:
-        age = request.user.profile.age
+        if anketa:
+            age = request.user.profile.anketa.age
+        else:
+            age = None
         user_icon = request.user.profile.user_icon
         username = request.user.username
         return render(

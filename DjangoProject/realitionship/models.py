@@ -20,10 +20,6 @@ class Profile(models.Model):
         max_length=280,
         null=True
     )
-    age = models.IntegerField(
-        blank=False,
-        null=True
-    )
     liked = models.ManyToManyField(User, related_name="liked", blank=True)
     disliked = models.ManyToManyField(User, related_name="disliked", blank=True)
 

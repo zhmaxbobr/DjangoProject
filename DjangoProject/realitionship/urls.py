@@ -8,6 +8,7 @@ urlpatterns = [
     path("profile/",views.view_profile,name="profile"),
     path("view_liked/", views.view_liked, name="liked"),
     path("view_disliked/", views.view_disliked, name="disliked"),
-    path("sign_up/",views.sign_up, name="sign_up")
+    path("sign_up/",views.sign_up, name="sign_up"),
+    path("match/",views.recomendation_search, name="match")
 ]
 

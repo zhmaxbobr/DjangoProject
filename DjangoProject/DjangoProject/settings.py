@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+from django.contrib import messages
 from django.conf.global_settings import MEDIA_ROOT, MEDIA_URL, STATICFILES_DIRS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,7 +29,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-
+MESSAGE_TAGS = {
+    messages.DEBUG:"debug",
+    messages.INFO:"info",
+    messages.SUCCESS:"success",
+    messages.ERROR:"danger",
+    messages.WARNING:"warning"
+}
 # Application definition
 
 INSTALLED_APPS = [
