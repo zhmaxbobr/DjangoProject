@@ -1,5 +1,6 @@
 from venv import create
 
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
@@ -56,7 +57,6 @@ def sign_up(request):
 
 @login_required
 def anketa(request):
-    default_age = 10
     try:
         anketa = request.user.profile.anketa
     except Exception:
@@ -98,32 +98,33 @@ def anketa(request):
 @login_required
 def view_profile(request):
     if request.method == "GET":
-        try:
-            anketa = request.user.profile.anketa
-        except Exception as e:
-            messages.warning(request, "Заполните анкету!")
-            anketa = None
-        likes_count = request.user.profile.liked.count()
-        dislikes_count = request.user.profile.disliked.count()
-        annotation = request.user.profile.annotation
-        if anketa:
-            age = request.user.profile.anketa.age
-        else:
-            age = None
-        user_icon = request.user.profile.user_icon
-        username = request.user.username
-        return render(
-            request,"realitionship/profile.html", context=
-        {
-            "likes_count":likes_count,
-            "dislikes_count":dislikes_count,
-            "annotation":annotation,
-            "age":age,
-            "user_icon":user_icon,
-            "username":username
-        }
-                      )
+        username = request.GET.get("username",None)
 
+        if not username:
+            profile = request.user.profile
+            try:
+                anketa = request.user.profile.anketa
+            except Exception as e:
+                messages.warning(request, "Заполните анкету!")
+        else:
+            profile = Profile.objects.filter(user__username=username).first()
+            if not profile:
+                return HttpResponse("Создайте профиль!")
+            print(f"PROFILE {profile}")
+
+        return render(
+            request, "realitionship/profile.html", context=
+            {
+            "likes_count":profile.liked.count(),
+            "dislikes_count":profile.disliked.count(),
+            "annotation": profile.annotation,
+            "age": profile.anketa.age if profile.anketa else None,
+            "user_icon": profile.user_icon,
+            "username": profile.user.username,
+            "is_user":True if request.user.username == username or username is None else False,
+            "show_marked_items":profile.show_marked_items
+            }
+        )
 def view_liked(request):
     liked_count = request.user.profile.liked.count()
     limit = int(request.GET.get("limit",2))

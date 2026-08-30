@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %} Профиль {{user.username}} {% endblock %}
+{% block title %} Профиль {{username}} {% endblock %}
 
 {% block content %}
 
@@ -30,14 +30,17 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Возраст: {{age|default:"Не указано"}}</li>
             </ul>
-            <div class="card-body mx-auto">
-                <a href="{% url 'rl:liked' %}" class="card-link"><i class="fa-solid fa-heart text-danger"> {{likes_count}}</i></a>
-                <a href="{% url 'rl:disliked' %}" class="card-link"><i class="fa-solid fa-heart-crack text-black"> {{dislikes_count}}</i></a>
-            </div>
+            {% if show_marked_items or is_user %}
+                <div class="card-body mx-auto">
+                    <a href="{% url 'rl:liked' %}" class="card-link"><i class="fa-solid fa-heart text-danger"> {{likes_count}}</i></a>
+                    <a href="{% url 'rl:disliked' %}" class="card-link"><i class="fa-solid fa-heart-crack text-black"> {{dislikes_count}}</i></a>
+                </div>
+            {% endif %}
+            {% if is_user %}
             <div class="mb-2 d-flex justify-content-center">
                   {% include 'realitionship/components/_logout_widget.html' %}
             </div>
-
+            {% endif %}
         </div>
     </div>
 

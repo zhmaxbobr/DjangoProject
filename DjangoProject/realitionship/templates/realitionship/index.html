@@ -11,14 +11,14 @@
             <!-- Левая колонка: фото и описание -->
             <div class="d-flex flex-column" style="flex: 1;">
                 <!-- Блок под фото (заглушка) -->
-                <img src="{{profile.user_icon.url}}" class="img-fluid rounded-5" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="{{anketa.profile.user_icon.url}}" class="img-fluid rounded-5" style="width: 100%; height: 100%; object-fit: cover;">
 
                 <p class="my-1 small d-flex justify-content-center"><b>{{profile.user.username}}</b></p>
 
 
                 <!-- Краткое описание -->
                 <div class="w-100" style="aspect-ratio: 4/1; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 12px;">
-                     <p class="text-muted mb-2 small px-1">{{profile.annotation}}</p>
+                     <p class="text-muted mb-2 small px-1">{{anketa.profile.annotation}}</p>
                 </div>
 
 
@@ -57,8 +57,28 @@
         </div>
     </div>
 </div>
+
+<!--КНОПКИ ПЕРЕХОДА НА СЛЕДУЮЩУЮ СТРАНИЦУ-->
+<div class="container my-2" style="width: 20vh;">
+    <div class="d-flex justify-content-between">
+        {% if show_prev_btn %}
+        <a href="{% url 'rl:liked' %}?page={{prev_page}}" class="btn btn-primary">
+            <i class="fa-solid fa-circle-arrow-left"></i>
+        </a>
+        {% endif %}
+        {% for page_num in pages %}
+        <a class="text-decoration-none" href="{% url 'rl:liked' %}?page={{page_num}}">{{page_num}}</a>
+        {% endfor %}
+        {% if show_next_btn %}
+        <a href="{% url 'rl:liked' %}?page={{next_page}}" class="btn btn-primary">
+            <i class="fa-solid fa-circle-arrow-right"></i>
+        </a>
+        {% endif %}
+    </div>
+</div>
 {% else %}
 Авторизуйтесь!
+
 {% endif %}
 
 {% endblock %}
