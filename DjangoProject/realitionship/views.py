@@ -23,50 +23,31 @@ def index(request):
 
 @login_required
 def recomendation_search(request):
+    mean_age = 2
     try:
         current_anketa = request.user.profile.anketa
     except Exception:
         messages.warning(request, "Заполните анкету!")
         return redirect("rl:anketa")
+    anketes = []
+    while len(anketes) == 0:
+        anketes = Anketa.objects.filter(
+            age__gte=current_anketa.age - mean_age,
+            age__lte=current_anketa.age + mean_age,
+        )
 
-    anketes = Anketa.objects.filter(
-        age__gte=current_anketa.age - 2,
-        age__lte=current_anketa.age + 2,
-    )
+        if current_anketa.find_gender != "both":
+            anketes = anketes.filter(gender=current_anketa.find_gender)
 
-    if current_anketa.find_gender != "both":
-        anketes = anketes.filter(gender=current_anketa.find_gender)
+        anketes = list(anketes)
+        try:
+            del anketes[anketes.index(request.user.profile.anketa)]
+        except Exception:
+            pass
+        mean_age += 1
 
-    anketes = list(anketes)
-    # try:
-    #     del anketes[anketes.index(request.user.profile.anketa)]
-    # except Exception:
-    #     pass
-
-    anketes_count = len(anketes)
-    limit = int(request.GET.get("limit", 2))
-    current_page = int(request.GET.get("page", 0))
-    offset = limit * current_page
-    end = limit + offset
-    pages = [page for page in range(round(anketes_count / limit))]
-    next_page = current_page + 1
-    prev_page = current_page - 1
-    anketes = anketes[offset:end]
-    if len(pages) > 0:
-        show_next_btn = True if next_page <= pages[-1] else False
-        show_prev_btn = True if prev_page >= 0 else False
-    else:
-        show_next_btn = False
-        show_prev_btn = False
-
-    return render(request, "realitionship/index.html", context={
+    return render(request, "realitionship/match.html", context={
         "anketes": anketes,
-        "current_page": current_page,
-        "pages": pages,
-        "next_page": next_page,
-        "prev_page": prev_page,
-        "show_next_btn": show_next_btn,
-        "show_prev_btn": show_prev_btn
     })
 
 
@@ -134,11 +115,12 @@ def view_profile(request):
             try:
                 anketa = request.user.profile.anketa
             except Exception as e:
+                anketa = None
                 messages.warning(request, "Заполните анкету!")
         else:
             profile = Profile.objects.filter(user__username=username).first()
             if not profile:
-                return HttpResponse("Создайте профиль!")
+                return HttpResponse("Такого профиля не существует, введён некорекктоный юзернейм")
 
         return render(
             request, "realitionship/profile.html", context=
@@ -146,7 +128,7 @@ def view_profile(request):
             "likes_count":profile.liked.count(),
             "dislikes_count":profile.disliked.count(),
             "annotation": profile.annotation,
-            "age": profile.anketa.age if profile.anketa else None,
+            "age": profile.anketa.age if anketa else None,
             "user_icon": profile.user_icon,
             "username": profile.user.username,
             "is_user":True if request.user.username == username or username is None else False,
