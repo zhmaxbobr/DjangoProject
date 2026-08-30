@@ -1,11 +1,10 @@
-from venv import create
-
-from django.http import HttpResponse
+import json
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
-
+from django.contrib.auth.models import User
 from .forms import Anketa as form_anketa
 from .models import Anketa,Profile
 from django.contrib.auth.decorators import login_required
@@ -45,7 +44,15 @@ def recomendation_search(request):
         except Exception:
             pass
         mean_age += 1
-
+    anketes = [{
+        "username":anketa.profile.user.username,
+        "annotation":anketa.profile.annotation,
+        "age":anketa.age,
+        "user_icon":anketa.profile.user_icon.url,
+        "user_id":request.user.pk
+                } for anketa in anketes]
+    anketes = json.dumps(anketes)
+    print(anketes)
     return render(request, "realitionship/match.html", context={
         "anketes": anketes,
     })
@@ -191,3 +198,17 @@ def view_disliked(request):
         "show_next_btn": show_next_btn,
         "show_prev_btn": show_prev_btn
     })
+
+@login_required
+def like(request, user_id:int):
+    user = User.objects.filter(pk=user_id).first()
+    if user:
+        request.user.profile.liked.add(user)
+    return JsonResponse({"status":"success"})
+
+@login_required
+def dislike(request, user_id:int):
+    user = User.objects.filter(pk=user_id).first()
+    if user:
+        request.user.profile.disliked.add(user)
+    return JsonResponse({"status":"success"})

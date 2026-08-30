@@ -5,45 +5,62 @@
 {% block content %}
 
 {% if user.is_authenticated %}
+<div x-data="{
+    index: 0,
+    cards: {{ anketes }},
 
-{% for anketa in anketes %}
-<div>
+    async like() {
+        await fetch('/like/' + this.cards[this.index].user_id, { method: 'POST' });
+        this.index = (this.index + 1) % this.cards.length;
+    },
+
+    async dislike() {
+        await fetch('/dislike/' + this.cards[this.index].user_id, { method: 'POST' });
+        this.index = (this.index + 1) % this.cards.length;
+    }
+}">
     <div class="container mt-4">
         <div class="row">
             <div class="card col-10 col-md-6 offset-1 offset-md-3">
                 <div class="d-flex mx-auto justify-content-center w-50" style="max-width: 30vh;">
-                    {% if anketa.profile.user_icon %}
+                    {% if user_icon %}
                     <img
-                      src="{{anketa.profile.user_icon.url}}"
-                      class="mt-3 border shadow rounded-circle"
-                      style="width: 150px; height: 150px; object-fit: cover;"
+                            src="{{user_icon}}"
+                            class="mt-3 border shadow rounded-circle"
+                            style="width: 150px; height: 150px; object-fit: cover;"
                     >
                     {% else %}
                     <img
-                      src="{% static 'default_user_icon.jpg' %}"
-                      class="mt-3 border shadow rounded-circle"
-                      style="width: 150px; height: 150px; object-fit: cover;"
+                            src="{% static 'default_user_icon.jpg' %}"
+                            class="mt-3 border shadow rounded-circle"
+                            style="width: 150px; height: 150px; object-fit: cover;"
                     >
                     {% endif %}
                 </div>
 
                 <div class="card-body">
-                    <h5 class="card-title">{{anketa.profile.user.username}}</h5>
-                    <p class="card-text">{{anketa.profile.annotation}}</p>
+                    <h5 x-text="cards[index].username" class="card-title"></h5>
+                    <p x-text="cards[index].annotation" class="card-text"></p>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">{{anketa.age}}</li>
+                    <li x-text="cards[index].age" class="list-group-item"></li>
                 </ul>
+                <div class="card-body mx-auto">
+                    <a href="#" class="card-link"><i class="fa-solid fa-heart text-danger">
+                    </i></a>
+                    <a href="#" class="card-link"><i class="fa-solid fa-heart-crack text-black">
+                    </i></a>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-{% endfor %}
 
+    </div>
+
+</div>
 
 
 {% else %}
-    Авторизуйтесь!
+Авторизуйтесь!
 {% endif %}
 
 {% endblock %}
