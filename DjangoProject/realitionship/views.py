@@ -11,9 +11,6 @@ from .models import Anketa,Profile
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
-
-
-
 def index(request):
     if request.user.is_authenticated:
         try:
@@ -27,20 +24,50 @@ def index(request):
 @login_required
 def recomendation_search(request):
     try:
-        anketa = request.user.profile.anketa
+        current_anketa = request.user.profile.anketa
     except Exception:
         messages.warning(request, "Заполните анкету!")
         return redirect("rl:anketa")
 
-    current_anketa = request.user.profile.anketa
     anketes = Anketa.objects.filter(
         age__gte=current_anketa.age - 2,
         age__lte=current_anketa.age + 2,
     )
+
     if current_anketa.find_gender != "both":
         anketes = anketes.filter(gender=current_anketa.find_gender)
 
-    return render(request, "realitionship/index.html",context={"anketes":anketes})
+    anketes = list(anketes)
+    # try:
+    #     del anketes[anketes.index(request.user.profile.anketa)]
+    # except Exception:
+    #     pass
+
+    anketes_count = len(anketes)
+    limit = int(request.GET.get("limit", 2))
+    current_page = int(request.GET.get("page", 0))
+    offset = limit * current_page
+    end = limit + offset
+    pages = [page for page in range(round(anketes_count / limit))]
+    next_page = current_page + 1
+    prev_page = current_page - 1
+    anketes = anketes[offset:end]
+    if len(pages) > 0:
+        show_next_btn = True if next_page <= pages[-1] else False
+        show_prev_btn = True if prev_page >= 0 else False
+    else:
+        show_next_btn = False
+        show_prev_btn = False
+
+    return render(request, "realitionship/index.html", context={
+        "anketes": anketes,
+        "current_page": current_page,
+        "pages": pages,
+        "next_page": next_page,
+        "prev_page": prev_page,
+        "show_next_btn": show_next_btn,
+        "show_prev_btn": show_prev_btn
+    })
 
 
 def sign_up(request):
@@ -85,6 +112,7 @@ def anketa(request):
                 )
         return redirect("rl:profile")
     else:
+        #POST
         initial = {}
         if anketa:
             initial = {
@@ -94,6 +122,7 @@ def anketa(request):
             }
         form = form_anketa(initial=initial)
         return render(request,"realitionship/anketa.html", context={"form":form})
+
 
 @login_required
 def view_profile(request):
@@ -110,7 +139,6 @@ def view_profile(request):
             profile = Profile.objects.filter(user__username=username).first()
             if not profile:
                 return HttpResponse("Создайте профиль!")
-            print(f"PROFILE {profile}")
 
         return render(
             request, "realitionship/profile.html", context=
@@ -125,6 +153,8 @@ def view_profile(request):
             "show_marked_items":profile.show_marked_items
             }
         )
+
+
 def view_liked(request):
     liked_count = request.user.profile.liked.count()
     limit = int(request.GET.get("limit",2))
@@ -151,6 +181,7 @@ def view_liked(request):
                                                                      "show_next_btn":show_next_btn,
                                                                      "show_prev_btn":show_prev_btn
                                                                      })
+
 
 def view_disliked(request):
     disliked_count = request.user.profile.disliked.count()

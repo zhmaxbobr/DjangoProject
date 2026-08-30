@@ -1,84 +1,66 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %} Компас {% endblock %}
 
 {% block content %}
 
 {% if user.is_authenticated %}
-<div class="container d-flex justify-content-center mt-3">
-    <div class="card shadow-sm border-0" style="max-width: 500px;">
-        <div class="card-body p-3 d-flex align-items-start gap-3">
-            <!-- Левая колонка: фото и описание -->
-            <div class="d-flex flex-column" style="flex: 1;">
-                <!-- Блок под фото (заглушка) -->
-                <img src="{{anketa.profile.user_icon.url}}" class="img-fluid rounded-5" style="width: 100%; height: 100%; object-fit: cover;">
 
-                <p class="my-1 small d-flex justify-content-center"><b>{{profile.user.username}}</b></p>
-
-
-                <!-- Краткое описание -->
-                <div class="w-100" style="aspect-ratio: 4/1; background-color: #f8f9fa; border-radius: 8px; margin-bottom: 12px;">
-                     <p class="text-muted mb-2 small px-1">{{anketa.profile.annotation}}</p>
+{% for anketa in anketes %}
+<div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="card col-10 col-md-6 offset-1 offset-md-3">
+                <div class="d-flex mx-auto justify-content-center w-50" style="max-width: 30vh;">
+                    {% if anketa.profile.user_icon %}
+                    <img
+                      src="{{anketa.profile.user_icon.url}}"
+                      class="mt-3 border shadow rounded-circle"
+                      style="width: 150px; height: 150px; object-fit: cover;"
+                    >
+                    {% else %}
+                    <img
+                      src="{% static 'default_user_icon.jpg' %}"
+                      class="mt-3 border shadow rounded-circle"
+                      style="width: 150px; height: 150px; object-fit: cover;"
+                    >
+                    {% endif %}
                 </div>
 
-
-                <!-- Кнопки действий -->
-                <div class="d-flex align-items-center gap-2">
-                    <a href="#" class="card-link"><i class="fa-solid fa-heart text-danger"></i></a>
-                    <button class="btn btn-outline-primary btn-sm p-2" title="Действие">
-                        Пропустить
-                    </button>
-                     <a href="#" class="card-link"><i class="fa-solid fa-heart-crack text-black">   </i></a>
+                <div class="card-body">
+                    <h5 class="card-title">{{anketa.profile.user.username}}</h5>
+                    <p class="card-text">{{anketa.profile.annotation}}</p>
                 </div>
-            </div>
-
-            <!-- Правая колонка: диаграмма и подпись -->
-            <div class="d-flex flex-column align-items-center justify-content-center align-items-center" style="flex: 2;">
-                <!-- Круговая диаграмма (SVG) -->
-                <div style="position: relative; width: 160px; height: 160px;">
-                    <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-                        <!-- Зелёный сектор (совпадения) -->
-                        <path d="M50,50 L50,0 A50,50 0 0,1 85.36,14.64 Z" fill="#2ECC71"/>
-                        <!-- Красный сектор (риски) -->
-                        <path d="M50,50 L85.36,14.64 A50,50 0 0,1 50,100 Z" fill="#E74C3C"/>
-                        <!-- Жёлтый сектор (дополнения) -->
-                        <path d="M50,50 L50,100 A50,50 0 0,1 14.64,85.36 Z" fill="#FDC726"/>
-                        <!-- Тёмно‑синий сектор (база) -->
-                        <path d="M50,50 L14.64,85.36 A50,50 0 0,1 50,0 Z" fill="#2980B9"/>
-                    </svg>
-                </div>
-
-                <!-- Подпись под диаграммой -->
-                <div class="mt-3 text-center">
-                    <h6 class="mb-0 fw-bold">Мэтч</h6>
-                    <p class="mb-0 text-muted small">Компас</p>
-                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{anketa.age}}</li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
+{% endfor %}
 
-<!--КНОПКИ ПЕРЕХОДА НА СЛЕДУЮЩУЮ СТРАНИЦУ-->
 <div class="container my-2" style="width: 20vh;">
     <div class="d-flex justify-content-between">
         {% if show_prev_btn %}
-        <a href="{% url 'rl:liked' %}?page={{prev_page}}" class="btn btn-primary">
+        <a href="{% url 'rl:match' %}?page={{prev_page}}" class="btn btn-primary">
             <i class="fa-solid fa-circle-arrow-left"></i>
         </a>
         {% endif %}
         {% for page_num in pages %}
-        <a class="text-decoration-none" href="{% url 'rl:liked' %}?page={{page_num}}">{{page_num}}</a>
+        <a class="text-decoration-none" href="{% url 'rl:match' %}?page={{page_num}}">{{page_num}}</a>
         {% endfor %}
         {% if show_next_btn %}
-        <a href="{% url 'rl:liked' %}?page={{next_page}}" class="btn btn-primary">
+        <a href="{% url 'rl:match' %}?page={{next_page}}" class="btn btn-primary">
             <i class="fa-solid fa-circle-arrow-right"></i>
         </a>
         {% endif %}
     </div>
 </div>
-{% else %}
-Авторизуйтесь!
 
+
+{% else %}
+    Авторизуйтесь!
 {% endif %}
 
 {% endblock %}
