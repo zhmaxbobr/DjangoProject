@@ -1,77 +1,112 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %} Компас {% endblock %}
+
+{% block title %}Компас{% endblock %}
 
 {% block content %}
 
 {% if user.is_authenticated %}
-<div x-data="{
-    index: 0,
-    cards: {{ anketes }},
 
-    async like() {
-        await fetch('/like/' + this.cards[this.index].user_id, { method: 'POST' });
-        this.index = (this.index + 1) % this.cards.length;
-    },
+<div
+    x-data="{
+        index: 0,
+        cards: {{ anketes }},
 
-    async dislike() {
-        await fetch('/dislike/' + this.cards[this.index].user_id, { method: 'POST' });
-        this.index = (this.index + 1) % this.cards.length;
-    }
-}">
-    <div class="container mt-4">
+        async like() {
+            if (!this.cards.length) return;
+
+            await fetch('/like/' + this.cards[this.index].user_id, {
+                method: 'POST'
+            });
+
+            this.index = (this.index + 1) % this.cards.length;
+        },
+
+        async dislike() {
+            if (!this.cards.length) return;
+
+            await fetch('/dislike/' + this.cards[this.index].user_id, {
+                method: 'POST'
+            });
+
+            this.index = (this.index + 1) % this.cards.length;
+        }
+    }"
+>
+    <div x-show="cards.length" class="container mt-4">
         <div class="row">
             <div class="card col-10 col-md-6 offset-1 offset-md-3">
-                <div class="d-flex mx-auto justify-content-center w-50" style="max-width: 30vh;">
+
+                <div
+                    class="d-flex mx-auto justify-content-center w-50"
+                    style="max-width: 30vh;"
+                >
                     {% if user_icon %}
-                    <img
-                            src="{{user_icon}}"
+                        <img
+                            src="{{ user_icon }}"
                             class="mt-3 border shadow rounded-circle"
                             style="width: 150px; height: 150px; object-fit: cover;"
-                    >
+                        >
                     {% else %}
-                    <img
+                        <img
                             src="{% static 'default_user_icon.jpg' %}"
                             class="mt-3 border shadow rounded-circle"
                             style="width: 150px; height: 150px; object-fit: cover;"
-                    >
+                        >
                     {% endif %}
                 </div>
 
                 <div class="card-body">
-                    <h5 x-text="cards[index].username" class="card-title"></h5>
-                    <p x-text="cards[index].annotation" class="card-text"></p>
+                    <h5
+                        x-text="cards[index].username"
+                        class="card-title"
+                    ></h5>
+
+                    <p
+                        x-text="cards[index].annotation"
+                        class="card-text"
+                    ></p>
                 </div>
+
                 <ul class="list-group list-group-flush">
-                    <li x-text="cards[index].age" class="list-group-item"></li>
+                    <li
+                        x-text="cards[index].age"
+                        class="list-group-item"
+                    ></li>
                 </ul>
+
                 <div class="card-body mx-auto">
-                    <a href="#" class="card-link"><i class="fa-solid fa-heart text-danger">
-                    </i></a>
-                    <a href="#" class="card-link"><i class="fa-solid fa-heart-crack text-black">
-                    </i></a>
+                    <button
+                        type="button"
+                        class="btn btn-link card-link"
+                        @click="like()"
+                    >
+                        <i class="fa-solid fa-heart text-danger"></i>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-link card-link"
+                        @click="dislike()"
+                    >
+                        <i class="fa-solid fa-heart-crack text-black"></i>
+                    </button>
                 </div>
+
             </div>
         </div>
-
     </div>
 
+    <div
+        x-show="!cards.length"
+        class="container mt-4 text-center"
+    >
+        <p>Анкет пока нет</p>
+    </div>
 </div>
 
-
 {% else %}
-Авторизуйтесь!
+    Авторизуйтесь!
 {% endif %}
 
 {% endblock %}
-
-
-<!--
-#6C7585 приглушённый серо‑синий (для второстепенного текста и меток)
-`#2ECC71` сочный зелёный (совпадения в компасе)
-`#FDC726` тёплый жёлтый (дополнения в компасе)
-`#E74C3C` яркий красно‑оранжевый (риски в компасе)
-`#3498DB` насыщенный синий (основная кнопка действия)
-`#2980B9` тёмно‑синий (активное состояние, наведение)
-`#D1D6DE` мягкий светло‑серый (иконки, разделители)
--->

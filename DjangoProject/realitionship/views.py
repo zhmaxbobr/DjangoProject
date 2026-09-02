@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from .forms import Anketa as form_anketa
 from .models import Anketa,Profile
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 def index(request):
@@ -23,13 +24,14 @@ def index(request):
 @login_required
 def recomendation_search(request):
     mean_age = 2
+    attempts = 0
     try:
         current_anketa = request.user.profile.anketa
     except Exception:
         messages.warning(request, "Заполните анкету!")
         return redirect("rl:anketa")
     anketes = []
-    while len(anketes) == 0:
+    while len(anketes) == 0 and attempts < 10:
         anketes = Anketa.objects.filter(
             age__gte=current_anketa.age - mean_age,
             age__lte=current_anketa.age + mean_age,
@@ -44,6 +46,7 @@ def recomendation_search(request):
         except Exception:
             pass
         mean_age += 1
+        attempts += 1
     anketes = [{
         "username":anketa.profile.user.username,
         "annotation":anketa.profile.annotation,
@@ -199,14 +202,18 @@ def view_disliked(request):
         "show_prev_btn": show_prev_btn
     })
 
+# BUG: get rid of csrf_exempt
 @login_required
+@csrf_exempt
 def like(request, user_id:int):
     user = User.objects.filter(pk=user_id).first()
     if user:
         request.user.profile.liked.add(user)
     return JsonResponse({"status":"success"})
 
+# BUG: get rid of csrf_exempt
 @login_required
+@csrf_exempt
 def dislike(request, user_id:int):
     user = User.objects.filter(pk=user_id).first()
     if user:
