@@ -29,7 +29,15 @@
                     <li class="nav-item"><a class="nav-link" href="#features">Возможности</a></li>
                     <li class="nav-item"><a class="nav-link" href="#about">О проекте</a></li>
                     <li class="nav-item"><a class="nav-link btn btn-outline-light px-3" href="#cta">Начать работу</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link btn btn-outline px-3" href="{% url 'rl:profile' %}">Профиль</a></li>
+                    {% endif %}
+                    {% if not user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link btn btn-outline px-3" href="{% url 'login' %}">Войти</a></li>
+                        <li class="nav-item"><a class="nav-link btn btn-outline px-3" href="{% url 'rl:sign_up' %}">Зарегистрироваться</a></li>
+                    {% endif %}
                 </ul>
+
             </div>
         </div>
     </nav>

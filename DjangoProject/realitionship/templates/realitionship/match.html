@@ -11,30 +11,40 @@
     x-data="{
         index: 0,
         cards: {{ anketes }},
-
-        async like() {
+        isFinished: false,
+        async like(index) {
             if (!this.cards.length) return;
 
-            await fetch('/like/' + this.cards[this.index].user_id, {
+            await fetch('/like/' + this.cards[index].user_id, {
                 method: 'POST'
             });
-
+            if (this.index >= this.cards.length-1)
+            {
+                this.isFinished = true;
+            }
             this.index = (this.index + 1) % this.cards.length;
         },
 
-        async dislike() {
+        async dislike(index) {
             if (!this.cards.length) return;
 
-            await fetch('/dislike/' + this.cards[this.index].user_id, {
+            await fetch('/dislike/' + this.cards[index].user_id, {
                 method: 'POST'
             });
-
+            if (this.index >= this.cards.length-1)
+            {
+                this.isFinished = true;
+            }
             this.index = (this.index + 1) % this.cards.length;
         }
     }"
 >
     <div x-show="cards.length" class="container mt-4">
         <div class="row">
+            <div x-show="isFinished" class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong>Все </strong>актуальные анкеты просмотрены.
+              <button @click="isFinished=!isFinished" type="button" class="btn-close"></button>
+            </div>
             <div class="card col-10 col-md-6 offset-1 offset-md-3">
 
                 <div
@@ -79,7 +89,7 @@
                     <button
                         type="button"
                         class="btn btn-link card-link"
-                        @click="like()"
+                        @click="like(index)"
                     >
                         <i class="fa-solid fa-heart text-danger"></i>
                     </button>
@@ -87,7 +97,7 @@
                     <button
                         type="button"
                         class="btn btn-link card-link"
-                        @click="dislike()"
+                        @click="dislike(index)"
                     >
                         <i class="fa-solid fa-heart-crack text-black"></i>
                     </button>

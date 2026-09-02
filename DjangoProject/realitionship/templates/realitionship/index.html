@@ -189,9 +189,11 @@
     <div class="container text-center">
         <h2 class="fw-bold mb-3">Готовы начать анализ?</h2>
         <p class="lead mb-4">Зарегистрируйтесь сегодня и получите доступ ко всем инструментам платформы.</p>
-        <a href="#" class="btn btn-light btn-lg px-5 rounded-pill shadow">
+         {% if not user.is_authenticated %}
+        <a href="rl:sign_up" class="btn btn-light btn-lg px-5 rounded-pill shadow">
             Создать аккаунт <i class="bi bi-arrow-right ms-2"></i>
         </a>
+        {% endif %}
     </div>
 </section>
 

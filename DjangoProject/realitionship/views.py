@@ -25,13 +25,14 @@ def index(request):
 def recomendation_search(request):
     mean_age = 2
     attempts = 0
+    allowed_anketes = 0
     try:
         current_anketa = request.user.profile.anketa
     except Exception:
         messages.warning(request, "Заполните анкету!")
         return redirect("rl:anketa")
     anketes = []
-    while len(anketes) == 0 and attempts < 10:
+    while len(anketes) == 0 and attempts < 20 and allowed_anketes<10:
         anketes = Anketa.objects.filter(
             age__gte=current_anketa.age - mean_age,
             age__lte=current_anketa.age + mean_age,
@@ -45,8 +46,12 @@ def recomendation_search(request):
             del anketes[anketes.index(request.user.profile.anketa)]
         except Exception:
             pass
-        mean_age += 1
+        if not anketes:
+            mean_age += 1
+        else:
+            allowed_anketes += len(anketes)
         attempts += 1
+    print(anketes)
     anketes = [{
         "username":anketa.profile.user.username,
         "annotation":anketa.profile.annotation,
@@ -208,6 +213,8 @@ def view_disliked(request):
 def like(request, user_id:int):
     user = User.objects.filter(pk=user_id).first()
     if user:
+        if user in request.user.profile.disliked.all():
+            request.user.profile.disliked.remove(user)
         request.user.profile.liked.add(user)
     return JsonResponse({"status":"success"})
 
@@ -217,5 +224,8 @@ def like(request, user_id:int):
 def dislike(request, user_id:int):
     user = User.objects.filter(pk=user_id).first()
     if user:
+        print(request.user.profile.liked)
+        if user in request.user.profile.liked.all():
+            request.user.profile.liked.remove(user)
         request.user.profile.disliked.add(user)
     return JsonResponse({"status":"success"})
